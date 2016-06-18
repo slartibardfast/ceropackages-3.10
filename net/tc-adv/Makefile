@@ -38,7 +38,7 @@ endef
 define Package/tc-adv
 $(call Package/tc-adv/Default)
   TITLE:=Traffic control utility with support for cake and fq_pie
-  DEPENDS:=+kmod-sched-core +kmod-sched-cake +kmod-sched-fq_pie
+  DEPENDS:=+kmod-sched-core +kmod-sched-cake +kmod-sched-fq_pie +libxtables
 endef
 
 ifeq ($(BUILD_VARIANT),tiny)
@@ -67,8 +67,6 @@ TARGET_CFLAGS += -ffunction-sections -fdata-sections
 MAKE_FLAGS += \
 	EXTRA_CCOPTS="$(TARGET_CFLAGS) -I../include -I$(STAGING_DIR)/usr/include/libnl-tiny" \
 	KERNEL_INCLUDE="$(LINUX_DIR)/include" \
-	SHARED_LIBS="" \
-	LDFLAGS="-Wl,--gc-sections" \
 	IP_CONFIG_TINY=$(IP_CONFIG_TINY) \
 	FPIC="$(FPIC)"
 
@@ -86,6 +84,8 @@ endef
 define Package/tc-adv/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tc/tc $(1)/usr/sbin/
+	$(INSTALL_DIR) $(1)/usr/lib/tc
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tc/m_xt.so $(1)/usr/lib/tc/
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_BIN) ./files/15-teql $(1)/etc/hotplug.d/iface/
 endef
